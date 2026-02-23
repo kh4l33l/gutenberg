@@ -36,21 +36,25 @@ process.env.TZ = 'UTC';
 module.exports = {
 	rootDir: '../../',
 	moduleNameMapper: {
-		// Mock @wordpress/vips/worker before the general pattern so it doesn't try to load the real file.
-		// The worker-code.ts file is auto-generated during full builds and is gitignored.
+		// Specific mappings first (before generic patterns)
 		'@wordpress/vips/worker':
 			'<rootDir>/test/unit/config/vips-worker-code-stub.js',
 		// Mock @wordpress/video-conversion/worker before the general pattern so it doesn't try to load the real file.
 		// The worker-code.ts file is auto-generated during full builds and is gitignored.
 		'@wordpress/video-conversion/worker':
 			'<rootDir>/test/unit/config/video-conversion-worker-code-stub.js',
-		[ `@wordpress\\/(${ transpiledPackageNames.join( '|' ) })$` ]:
-			'packages/$1/src',
 		'@wordpress/theme/design-tokens.js':
 			'<rootDir>/packages/theme/src/prebuilt/js/design-tokens.mjs',
 		'.+\\.wasm$': '<rootDir>/test/unit/config/wasm-stub.js',
+		// Map deep paths (e.g., @wordpress/block-editor/src/hooks/list-view)
+		[ `@wordpress\\/(${ transpiledPackageNames.join( '|' ) })\\/(.+)$` ]:
+			'packages/$1/$2',
+		// Then map exact package imports (e.g., @wordpress/compose)
+		[ `@wordpress\\/(${ transpiledPackageNames.join( '|' ) })$` ]:
+			'packages/$1/src',
 	},
 	preset: jestPresetDefaultDir,
+	testEnvironment: require.resolve( 'jest-environment-jsdom' ),
 	setupFiles: [
 		'<rootDir>/test/unit/config/global-mocks.js',
 		'<rootDir>/test/unit/config/gutenberg-env.js',
@@ -78,7 +82,7 @@ module.exports = {
 		'^.+\\.m?[jt]sx?$': '<rootDir>/test/unit/scripts/babel-transformer.js',
 	},
 	transformIgnorePatterns: [
-		'/node_modules/(?!(docker-compose|yaml|preact|@preact|parsel-js|comctx|uuid|marked)/)',
+		'/node_modules/(?!(\\.store/.+/node_modules/)?(docker-compose|yaml|preact|@preact|parsel-js|comctx|uuid|marked)/)',
 		'\\.pnp\\.[^\\/]+$',
 	],
 	snapshotSerializers: [
@@ -98,7 +102,7 @@ module.exports = {
 		'<rootDir>packages/scripts/config/jest-github-actions-reporter/index.js',
 		process.env.CI
 			? [
-					'@flakiness/jest',
+					require.resolve( '@flakiness/jest' ),
 					{
 						flakinessProject: 'WordPress/gutenberg',
 						duplicates: 'rename',

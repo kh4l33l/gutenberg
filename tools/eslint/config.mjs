@@ -28,6 +28,12 @@ const require = createRequire( import.meta.url );
 const rootDir = resolve( import.meta.dirname, '../..' );
 const wpPlugin = require( '@wordpress/eslint-plugin' );
 
+// Use the installed React version for linting.
+let reactVersion = 'detect';
+try {
+	reactVersion = require( 'react/package.json' ).version;
+} catch {}
+
 /**
  * ESLint v10 forbids redefining a plugin under the same key unless the
  * reference is strictly identical. Because the @wordpress/eslint-plugin
@@ -951,4 +957,9 @@ export default dedupePlugins( [
 
 	// Package-level configs (kept alongside the code they apply to).
 	...wpBuildConfig,
+
+	// Use the installed React version for linting, instead of relying on detection.
+	{
+		settings: { react: { version: reactVersion } },
+	},
 ] );
