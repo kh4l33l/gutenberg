@@ -14,6 +14,7 @@ const {
 } = require( './parse-source-string' );
 const {
 	ValidationError,
+	checkString,
 	checkPort,
 	checkStringArray,
 	checkObjectWithValues,
@@ -55,6 +56,9 @@ const mergeConfigs = require( './merge-configs' );
  * @property {boolean}                   phpmyadmin     Whether to enable phpMyAdmin.
  * @property {number}                    phpmyadminPort The port to use for phpMyAdmin. Random if empty.
  * @property {boolean}                   multisite      Whether to set up a multisite installation.
+ * @property {string}                    adminUser      The username for the administrator account created on install.
+ * @property {string}                    adminPassword  The password for the administrator account created on install.
+ * @property {string}                    adminEmail     The email address for the administrator account created on install.
  * @property {Object}                    config         Mapping of wp-config.php constants to their desired values.
  * @property {Object.<string, WPSource>} mappings       Mapping of WordPress directories to local directories which should be mounted.
  * @property {string|null}               phpVersion     Version of PHP to use in the environments, of the format 0.0.
@@ -95,6 +99,9 @@ const DEFAULT_ENVIRONMENT_CONFIG = {
 	phpmyadmin: false,
 	phpmyadminPort: null,
 	multisite: false,
+	adminUser: 'admin',
+	adminPassword: 'password',
+	adminEmail: 'wordpress@example.com',
 	mappings: {},
 	config: {
 		FS_METHOD: 'direct',
@@ -525,6 +532,33 @@ async function parseEnvironmentConfig(
 
 	if ( config.multisite !== undefined ) {
 		parsedConfig.multisite = config.multisite;
+	}
+
+	if ( config.adminUser !== undefined ) {
+		checkString(
+			configFile,
+			`${ environmentPrefix }adminUser`,
+			config.adminUser
+		);
+		parsedConfig.adminUser = config.adminUser;
+	}
+
+	if ( config.adminPassword !== undefined ) {
+		checkString(
+			configFile,
+			`${ environmentPrefix }adminPassword`,
+			config.adminPassword
+		);
+		parsedConfig.adminPassword = config.adminPassword;
+	}
+
+	if ( config.adminEmail !== undefined ) {
+		checkString(
+			configFile,
+			`${ environmentPrefix }adminEmail`,
+			config.adminEmail
+		);
+		parsedConfig.adminEmail = config.adminEmail;
 	}
 
 	if ( config.phpVersion !== undefined ) {

@@ -613,6 +613,9 @@ To enable editor autocomplete and validation, add a `$schema` key:
 | `"phpmyadmin"`       | `boolean`      | `false`                                | Whether to enable phpMyAdmin for database management.                                                                            |
 | `"phpmyadminPort"`   | `integer`      | `null` (randomly assigned)             | The port number for phpMyAdmin (Docker only). Setting this also enables phpMyAdmin.                                              |
 | `"multisite"`        | `boolean`      | `false`                                | Whether to set up a multisite installation.                                                                                      |
+| `"adminUser"`        | `string`       | `"admin"`                              | The username for the administrator account that is created when WordPress is installed.                                          |
+| `"adminPassword"`    | `string`       | `"password"`                           | The password for the administrator account that is created when WordPress is installed.                                          |
+| `"adminEmail"`       | `string`       | `"wordpress@example.com"`              | The email address for the administrator account that is created when WordPress is installed.                                     |
 | `"lifecycleScripts"` | `Object`       | `"{}"`                                 | Mapping of commands that should be executed at certain points in the lifecycle.                                                   |
 
 _Note: the port number environment variable (`WP_ENV_PORT`) takes precedence over the .wp-env.json value._
@@ -837,6 +840,21 @@ You can tell `wp-env` if the site should be multisite enabled.
 	"plugins": [ "." ]
 }
 ```
+
+### Administrator account
+
+By default `wp-env` creates an administrator account with the username `admin`, the password `password`, and the email `wordpress@example.com`. You can override any of these before the environment is created.
+
+```json
+{
+	"adminUser": "sysadmin",
+	"adminPassword": "supersecret",
+	"adminEmail": "admin@example.org",
+	"plugins": [ "." ]
+}
+```
+
+These values are only applied when WordPress is first installed. Changing them afterwards has no effect on an existing environment until it is recreated (for example with `wp-env destroy` followed by `wp-env start`, or `wp-env clean all`). Like the other options, they can be set per-environment under the `env` key.
 
 ### Node Lifecycle Script
 

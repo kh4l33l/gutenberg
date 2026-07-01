@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Add `adminUser`, `adminPassword`, and `adminEmail` configuration options so the administrator account credentials can be set before the environment is created.
+
 ## 11.9.0 (2026-06-24)
 
 ## 11.8.1 (2026-06-16)
